@@ -1,0 +1,12 @@
+{
+  "tavolo":    { "name": "Tavolo verde",      "bg": [165, 0.02],  "primary": [160, 0.12], "accent": 85,  "lava": [160, 85, 200] },
+  "oceano":    { "name": "Oceano",            "bg": [235, 0.025], "primary": [245, 0.14], "accent": 200, "lava": [240, 195, 265] },
+  "lavanda":   { "name": "Lavanda",           "bg": [295, 0.02],  "primary": [295, 0.13], "accent": 330, "lava": [295, 330, 250] },
+  "tramonto":  { "name": "Tramonto",          "bg": [40, 0.025],  "primary": [40, 0.16],  "accent": 0,   "lava": [45, 10, 75] },
+  "foresta":   { "name": "Foresta incantata", "bg": [145, 0.03],  "primary": [140, 0.13], "accent": 90,  "lava": [135, 95, 170] },
+  "caramella": { "name": "Caramella",         "bg": [350, 0.025], "primary": [350, 0.15], "accent": 220, "lava": [350, 215, 300] },
+  "vulcano":   { "name": "Vulcano",           "bg": [25, 0.035],  "primary": [28, 0.19],  "accent": 60,  "lava": [25, 55, 5] },
+  "neon":      { "name": "Neon",              "bg": [285, 0.05],  "primary": [335, 0.24], "accent": 200, "lava": [335, 200, 285] },
+  "reale":     { "name": "Reale",             "bg": [300, 0.035], "primary": [300, 0.15], "accent": 85,  "lava": [300, 85, 265] },
+  "aurora":    { "name": "Aurora boreale",    "bg": [200, 0.035], "primary": [170, 0.14], "accent": 300, "lava": [160, 300, 220] }
+}
