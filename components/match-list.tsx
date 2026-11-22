@@ -32,10 +32,11 @@ export function MatchList({
   return (
     <ul className="divide-y rounded-xl border bg-card">
       {matches.map((m) => {
-        const winner = players.get(m.winner_id);
+        const winnerIds = new Set(m.match_winners.map((w) => w.player_id));
+        const winners = [...winnerIds].map((id) => players.get(id)).filter((p): p is PlayerCard => !!p);
         const others = m.match_players
           .map((mp) => players.get(mp.player_id))
-          .filter((p): p is PlayerCard => !!p && p.id !== m.winner_id);
+          .filter((p): p is PlayerCard => !!p && !winnerIds.has(p.id));
         const canDelete =
           m.created_by === currentUserId &&
           now - new Date(m.created_at).getTime() < RULES.deleteWindowHours * 3600_000;
@@ -66,13 +67,13 @@ export function MatchList({
               )}
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              {winner && (
-                <Link href={`/profilo/${winner.username}`} className="flex items-center gap-2 pt-2">
+              {winners.map((winner) => (
+                <Link key={winner.id} href={`/profilo/${winner.username}`} className="flex items-center gap-2 pt-2">
                   <PlayerAvatar player={winner} size="sm" />
                   <span className="font-semibold">{winner.display_name}</span>
                   <Trophy className="size-4 text-amber-500" aria-label="vincitore" />
                 </Link>
-              )}
+              ))}
               {others.length > 0 && (
                 <span className="text-sm text-muted-foreground">
                   contro {others.map((p) => p.display_name).join(", ")}

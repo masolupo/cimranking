@@ -21,8 +21,8 @@ export default async function HomePage() {
   ]);
 
   const me = players.find((p) => p.id === profile.id) ?? { ...profile, crown: null, frame: null, title: null };
-  const rankIndex = leaderboard.findIndex((r) => r.player_id === profile.id);
-  const myRow = rankIndex >= 0 ? leaderboard[rankIndex] : null;
+  const myRow = leaderboard.find((r) => r.player_id === profile.id) ?? null;
+  const tiedWith = myRow ? leaderboard.filter((r) => r.rank === myRow.rank).length - 1 : 0;
 
   return (
     <>
@@ -39,7 +39,8 @@ export default async function HomePage() {
             {myRow ? (
               <>
                 <span>
-                  <strong className="text-foreground">{rankIndex + 1}°</strong> in classifica
+                  <strong className="text-foreground">{myRow.rank}°</strong> in classifica
+                  {tiedWith > 0 && " (pari merito)"}
                 </span>
                 <span aria-hidden="true">·</span>
                 <span>

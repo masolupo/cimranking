@@ -22,7 +22,7 @@ export async function recordMatch(input: {
   gameId: string;
   playedAt: string;
   playerIds: string[];
-  winnerId: string;
+  winnerIds: string[];
   notes: string;
 }): Promise<Result> {
   const { supabase } = await authed();
@@ -30,7 +30,7 @@ export async function recordMatch(input: {
     p_game_id: input.gameId,
     p_played_at: input.playedAt,
     p_player_ids: input.playerIds,
-    p_winner_id: input.winnerId,
+    p_winner_ids: input.winnerIds,
     p_notes: input.notes,
   });
   if (error) return { error: error.message };

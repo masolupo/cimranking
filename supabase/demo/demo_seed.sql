@@ -63,13 +63,14 @@ begin
       players := players || p[((winners[i] - 1 + k) % 4) + 1];
     end loop;
 
-    insert into public.matches (game_id, played_at, winner_id, created_by)
-    values (g[1 + (i % array_length(g, 1))], current_date - (28 - i), p[winners[i]], p[1])
+    insert into public.matches (game_id, played_at, created_by)
+    values (g[1 + (i % array_length(g, 1))], current_date - (28 - i), p[1])
     returning id into m;
 
     foreach pl in array players loop
       insert into public.match_players (match_id, player_id) values (m, pl);
       if pl = p[winners[i]] then
+        insert into public.match_winners (match_id, player_id) values (m, pl);
         update public.profiles set coins = coins + 10 where id = pl;
         insert into public.coin_transactions (user_id, amount, reason, match_id) values (pl, 10, 'win', m);
       else

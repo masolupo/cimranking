@@ -17,10 +17,11 @@ where game_id in (
 
 -- partite (anche su giochi veri) in cui compare un giocatore demo
 delete from public.matches
-where winner_id in (
+where created_by in (
     'd0000001-0000-4000-8000-00000000d001', 'd0000002-0000-4000-8000-00000000d002',
     'd0000003-0000-4000-8000-00000000d003', 'd0000004-0000-4000-8000-00000000d004'
   )
+  -- i vincitori sono sempre anche partecipanti, quindi basta match_players
   or id in (
     select match_id from public.match_players where player_id in (
       'd0000001-0000-4000-8000-00000000d001', 'd0000002-0000-4000-8000-00000000d002',

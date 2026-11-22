@@ -15,6 +15,8 @@ export type PlayerCard = Cosmetics & {
 
 export type LeaderboardRow = Cosmetics & {
   player_id: string;
+  /** posizione con pari merito: stessi punti = stessa posizione (1, 1, 2, ...) */
+  rank: number;
   played: number;
   wins: number;
   points: number;
@@ -50,9 +52,9 @@ export type MatchRow = {
   created_at: string;
   created_by: string;
   notes: string | null;
-  winner_id: string;
   game: { name: string; slug: string; cover_path: string | null } | null;
   match_players: { player_id: string }[];
+  match_winners: { player_id: string }[];
 };
 
 export type Profile = {

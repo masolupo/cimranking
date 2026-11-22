@@ -3,15 +3,17 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { LeaderboardRow, MatchRow, PlayerCard } from "@/lib/types";
 
 const MATCH_SELECT =
-  "id, played_at, created_at, created_by, notes, winner_id, game:games(name, slug, cover_path), match_players(player_id)";
+  "id, played_at, created_at, created_by, notes, game:games(name, slug, cover_path), match_players(player_id), match_winners(player_id)";
 
+/** Ordine: posizione (pari merito sui punti), poi più vittorie, meno partite, nome. */
 export async function getOverallLeaderboard(supabase: SupabaseClient, limit?: number) {
   let q = supabase
-    .from("overall_leaderboard")
+    .from("overall_standings")
     .select("*")
-    .order("points", { ascending: false })
+    .order("rank", { ascending: true })
     .order("wins", { ascending: false })
-    .order("played", { ascending: true });
+    .order("played", { ascending: true })
+    .order("display_name", { ascending: true });
   if (limit) q = q.limit(limit);
   const { data } = await q.returns<LeaderboardRow[]>();
   return data ?? [];
@@ -19,12 +21,13 @@ export async function getOverallLeaderboard(supabase: SupabaseClient, limit?: nu
 
 export async function getGameLeaderboard(supabase: SupabaseClient, gameId: string) {
   const { data } = await supabase
-    .from("game_leaderboard")
+    .from("game_standings")
     .select("*")
     .eq("game_id", gameId)
-    .order("points", { ascending: false })
+    .order("rank", { ascending: true })
     .order("wins", { ascending: false })
     .order("played", { ascending: true })
+    .order("display_name", { ascending: true })
     .returns<LeaderboardRow[]>();
   return data ?? [];
 }

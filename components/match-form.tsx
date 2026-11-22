@@ -15,6 +15,11 @@ import { RULES } from "@/lib/rules";
 import type { Game, PlayerCard } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
+/** "Marco", "Marco e Giulia", "Marco, Giulia e Luca" */
+function formatNames(names: string[]) {
+  return names.length <= 1 ? (names[0] ?? "") : `${names.slice(0, -1).join(", ")} e ${names.at(-1)}`;
+}
+
 function today() {
   const d = new Date();
   d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
@@ -39,25 +44,29 @@ export function MatchForm({
   );
   const [playedAt, setPlayedAt] = useState(today);
   const [selected, setSelected] = useState<string[]>([currentUserId]);
-  const [winnerId, setWinnerId] = useState<string | null>(null);
+  const [winnerIds, setWinnerIds] = useState<string[]>([]);
   const [notes, setNotes] = useState("");
 
   function togglePlayer(id: string) {
-    setSelected((prev) => {
-      const next = prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id];
-      if (!next.includes(winnerId ?? "")) setWinnerId(null);
-      return next;
-    });
+    const next = selected.includes(id) ? selected.filter((p) => p !== id) : [...selected, id];
+    setSelected(next);
+    setWinnerIds((prev) => prev.filter((w) => next.includes(w)));
+  }
+
+  function toggleWinner(id: string) {
+    setWinnerIds((prev) => (prev.includes(id) ? prev.filter((w) => w !== id) : [...prev, id]));
   }
 
   const selectedPlayers = players.filter((p) => selected.includes(p.id));
-  const canSubmit = gameId && selected.length >= 2 && winnerId && !pending;
+  const winnerNames = players.filter((p) => winnerIds.includes(p.id)).map((p) => p.display_name);
+  const everyoneWon = winnerIds.length === selected.length;
+  const canSubmit = gameId && selected.length >= 2 && winnerIds.length > 0 && !pending;
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!winnerId) return;
+    if (winnerIds.length === 0) return;
     startTransition(async () => {
-      const res = await recordMatch({ gameId, playedAt, playerIds: selected, winnerId, notes });
+      const res = await recordMatch({ gameId, playedAt, playerIds: selected, winnerIds, notes });
       if (res.error) {
         toast.error(res.error);
         return;
@@ -130,20 +139,23 @@ export function MatchForm({
       </fieldset>
 
       <fieldset className="grid gap-3" disabled={selected.length < 2}>
-        <legend className="mb-3 text-sm font-medium">2. Chi ha vinto?</legend>
+        <legend className="mb-3 text-sm font-medium">
+          2. Chi ha vinto?{" "}
+          <span className="text-muted-foreground">(anche più di uno, es. Avalon o giochi a squadre)</span>
+        </legend>
         {selected.length < 2 ? (
           <p className="text-sm text-muted-foreground">Seleziona almeno 2 giocatori.</p>
         ) : (
-          <div role="radiogroup" aria-label="Vincitore" className="flex flex-wrap gap-2">
+          <div role="group" aria-label="Vincitori" className="flex flex-wrap gap-2">
             {selectedPlayers.map((p) => {
-              const on = winnerId === p.id;
+              const on = winnerIds.includes(p.id);
               return (
                 <button
                   key={p.id}
                   type="button"
-                  role="radio"
+                  role="checkbox"
                   aria-checked={on}
-                  onClick={() => setWinnerId(p.id)}
+                  onClick={() => toggleWinner(p.id)}
                   className={cn(
                     "flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm font-medium transition-colors",
                     "focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none",
@@ -172,10 +184,16 @@ export function MatchForm({
       </div>
 
       <div className="sticky bottom-20 z-10 flex flex-col gap-2 rounded-xl border bg-background/95 p-3 backdrop-blur md:static md:border-0 md:bg-transparent md:p-0">
-        {winnerId && (
+        {winnerIds.length > 0 && (
           <p className="flex flex-wrap items-center gap-1 text-sm text-muted-foreground">
-            {players.find((p) => p.id === winnerId)?.display_name} riceve +{RULES.win.coins} <CoinIcon />, gli altri +
-            {RULES.participation.coins} <CoinIcon />
+            {formatNames(winnerNames)} {winnerIds.length === 1 ? "riceve" : "ricevono"} +{RULES.win.points} punti e +
+            {RULES.win.coins} <CoinIcon />
+            {winnerIds.length > 1 && " a testa"}
+            {!everyoneWon && (
+              <>
+                , gli altri +{RULES.participation.points} punto e +{RULES.participation.coins} <CoinIcon />
+              </>
+            )}
           </p>
         )}
         <Button type="submit" size="lg" className="h-12 text-base" disabled={!canSubmit}>

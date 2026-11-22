@@ -40,10 +40,11 @@ export function LeaderboardTable({ rows }: { rows: LeaderboardRow[] }) {
             <span
               className={cn(
                 "flex size-7 items-center justify-center rounded-full text-sm font-bold tabular-nums",
-                MEDALS[i] ?? "text-muted-foreground",
+                MEDALS[row.rank - 1] ?? "text-muted-foreground",
               )}
+              title={rows[i - 1]?.rank === row.rank || rows[i + 1]?.rank === row.rank ? "Pari merito" : undefined}
             >
-              {i + 1}
+              {row.rank}
             </span>
             <PlayerChip player={row} className="pt-2" />
             <span className="text-right text-lg font-bold tabular-nums">{row.points}</span>

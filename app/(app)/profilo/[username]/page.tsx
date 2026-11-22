@@ -30,9 +30,9 @@ export default async function ProfiloPage({ params }: PageProps<"/profilo/[usern
   if (!player) notFound();
 
   const [{ data: overall }, { data: perGame }, matches, players, { data: games }] = await Promise.all([
-    supabase.from("overall_leaderboard").select("*").eq("player_id", player.id).maybeSingle<LeaderboardRow>(),
+    supabase.from("overall_standings").select("*").eq("player_id", player.id).maybeSingle<LeaderboardRow>(),
     supabase
-      .from("game_leaderboard")
+      .from("game_standings")
       .select("*")
       .eq("player_id", player.id)
       .order("points", { ascending: false })
@@ -91,7 +91,8 @@ export default async function ProfiloPage({ params }: PageProps<"/profilo/[usern
                     {game?.name}
                   </Link>
                   <span className="shrink-0 text-sm text-muted-foreground tabular-nums">
-                    <span className="font-semibold text-foreground">{g.points} pt</span> · {g.wins}/{g.played} vinte
+                    {g.rank}° · <span className="font-semibold text-foreground">{g.points} pt</span> · {g.wins}/{g.played}{" "}
+                    vinte
                   </span>
                 </li>
                 );
