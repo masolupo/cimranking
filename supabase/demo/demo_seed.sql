@@ -21,13 +21,13 @@ from (values
 ) as u(id, email);
 
 update public.profiles p
-set username = v.username, display_name = v.display_name, onboarded = true
+set display_name = v.display_name, onboarded = true
 from (values
-  ('d0000001-0000-4000-8000-00000000d001'::uuid, 'marco_r', 'Marco Rossi'),
-  ('d0000002-0000-4000-8000-00000000d002'::uuid, 'giulia_b', 'Giulia Bianchi'),
-  ('d0000003-0000-4000-8000-00000000d003'::uuid, 'luca_f', 'Luca Ferri'),
-  ('d0000004-0000-4000-8000-00000000d004'::uuid, 'sara_c', 'Sara Conti')
-) as v(id, username, display_name)
+  ('d0000001-0000-4000-8000-00000000d001'::uuid, 'Marco Rossi'),
+  ('d0000002-0000-4000-8000-00000000d002'::uuid, 'Giulia Bianchi'),
+  ('d0000003-0000-4000-8000-00000000d003'::uuid, 'Luca Ferri'),
+  ('d0000004-0000-4000-8000-00000000d004'::uuid, 'Sara Conti')
+) as v(id, display_name)
 where p.id = v.id;
 
 -- 2) Giochi
