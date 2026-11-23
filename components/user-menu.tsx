@@ -28,11 +28,10 @@ export function UserMenu({ me }: { me: PlayerCard }) {
         <DropdownMenuGroup>
           <DropdownMenuLabel>
             <span className="block truncate font-semibold text-foreground">{me.display_name}</span>
-            <span className="block truncate text-xs font-normal">@{me.username}</span>
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem render={<Link href={`/profilo/${me.username}`} />}>
+        <DropdownMenuItem render={<Link href={`/profilo/${me.id}`} />}>
           <User /> Il mio profilo
         </DropdownMenuItem>
         <DropdownMenuItem render={<Link href="/personalizza" />}>

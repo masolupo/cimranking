@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cache } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CoinBadge } from "@/components/coin-badge";
@@ -11,22 +12,28 @@ import { getMatches, getPlayerCards, playersById } from "@/lib/data";
 import { publicImageUrl } from "@/lib/storage";
 import type { LeaderboardRow, PlayerCard } from "@/lib/types";
 
-export async function generateMetadata({ params }: PageProps<"/profilo/[username]">): Promise<Metadata> {
-  const { username } = await params;
-  return { title: `@${username}` };
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+const getPlayer = cache(async (id: string) => {
+  if (!UUID.test(id)) return null;
+  const { supabase } = await requireProfile();
+  const { data } = await supabase.from("player_cards").select("*").eq("id", id).maybeSingle<PlayerCard>();
+  return data;
+});
+
+export async function generateMetadata({ params }: PageProps<"/profilo/[id]">): Promise<Metadata> {
+  const { id } = await params;
+  const player = await getPlayer(id);
+  return { title: player?.display_name ?? "Profilo" };
 }
 
 type GameStat = LeaderboardRow & { game_id: string };
 
-export default async function ProfiloPage({ params }: PageProps<"/profilo/[username]">) {
-  const { username } = await params;
+export default async function ProfiloPage({ params }: PageProps<"/profilo/[id]">) {
+  const { id } = await params;
   const { supabase, profile } = await requireProfile();
 
-  const { data: player } = await supabase
-    .from("player_cards")
-    .select("*")
-    .eq("username", username)
-    .maybeSingle<PlayerCard>();
+  const player = await getPlayer(id);
   if (!player) notFound();
 
   const [{ data: overall }, { data: perGame }, matches, players, { data: games }] = await Promise.all([
@@ -57,7 +64,6 @@ export default async function ProfiloPage({ params }: PageProps<"/profilo/[usern
         <PlayerAvatar player={player} size="lg" className="mt-6" />
         <div className="min-w-0 flex-1">
           <h1 className="font-heading text-3xl font-bold tracking-tight">{player.display_name}</h1>
-          <p className="text-muted-foreground">@{player.username}</p>
           {player.title && (
             <p className="mt-1 font-semibold text-amber-700 dark:text-gold">{player.title}</p>
           )}
@@ -102,7 +108,7 @@ export default async function ProfiloPage({ params }: PageProps<"/profilo/[usern
         </section>
         <section>
           <SectionTitle>Ultime partite</SectionTitle>
-          <MatchList matches={matches} players={playersById(players)} currentUserId={profile.id} />
+          <MatchList matches={matches} players={playersById(players)} canDelete={profile.is_admin} />
         </section>
       </div>
 
@@ -110,7 +116,6 @@ export default async function ProfiloPage({ params }: PageProps<"/profilo/[usern
         <section className="mt-10 max-w-md">
           <SectionTitle>Modifica profilo</SectionTitle>
           <ProfileForm
-            username={profile.username}
             displayName={profile.display_name}
             avatarUrl={publicImageUrl("avatars", profile.avatar_url)}
           />

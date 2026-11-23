@@ -27,7 +27,7 @@ export default async function HomePage() {
   return (
     <>
       <section className="mt-4 mb-6 flex flex-wrap items-center gap-x-4 gap-y-4">
-        <Link href={`/profilo/${me.username}`} className="shrink-0" aria-label="Il mio profilo">
+        <Link href={`/profilo/${me.id}`} className="shrink-0" aria-label="Il mio profilo">
           <PlayerAvatar player={me} size="mdl" />
         </Link>
         <div className="min-w-0 flex-1">
@@ -92,7 +92,7 @@ export default async function HomePage() {
         </section>
         <section>
           <SectionTitle>Ultime partite</SectionTitle>
-          <MatchList matches={matches} players={playersById(players)} currentUserId={profile.id} />
+          <MatchList matches={matches} players={playersById(players)} canDelete={profile.is_admin} />
         </section>
       </div>
     </>

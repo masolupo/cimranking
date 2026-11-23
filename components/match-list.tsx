@@ -3,19 +3,19 @@ import { Trophy } from "lucide-react";
 import { ActionButton } from "@/components/action-button";
 import { PlayerAvatar } from "@/components/player-avatar";
 import { deleteMatch } from "@/app/actions";
-import { RULES } from "@/lib/rules";
 import type { MatchRow, PlayerCard } from "@/lib/types";
 import { formatDate } from "@/lib/utils-app";
 
 export function MatchList({
   matches,
   players,
-  currentUserId,
+  canDelete = false,
   showGame = true,
 }: {
   matches: MatchRow[];
   players: Map<string, PlayerCard>;
-  currentUserId: string;
+  /** solo l'admin può cancellare le partite */
+  canDelete?: boolean;
   showGame?: boolean;
 }) {
   if (matches.length === 0) {
@@ -26,9 +26,6 @@ export function MatchList({
     );
   }
 
-  // eslint-disable-next-line react-hooks/purity -- calcolato a ogni richiesta, va bene
-  const now = Date.now();
-
   return (
     <ul className="divide-y rounded-xl border bg-card">
       {matches.map((m) => {
@@ -37,9 +34,6 @@ export function MatchList({
         const others = m.match_players
           .map((mp) => players.get(mp.player_id))
           .filter((p): p is PlayerCard => !!p && !winnerIds.has(p.id));
-        const canDelete =
-          m.created_by === currentUserId &&
-          now - new Date(m.created_at).getTime() < RULES.deleteWindowHours * 3600_000;
 
         return (
           <li key={m.id} className="flex flex-col gap-2 px-4 py-3">
@@ -60,15 +54,15 @@ export function MatchList({
                   variant="ghost"
                   size="sm"
                   action={deleteMatch.bind(null, m.id)}
-                  confirmText="Cancellare questa partita? Le monete verranno stornate."
+                  confirmText="Eliminare questa partita? Le monete verranno stornate."
                 >
-                  Annulla
+                  Elimina
                 </ActionButton>
               )}
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
               {winners.map((winner) => (
-                <Link key={winner.id} href={`/profilo/${winner.username}`} className="flex items-center gap-2 pt-2">
+                <Link key={winner.id} href={`/profilo/${winner.id}`} className="flex items-center gap-2 pt-2">
                   <PlayerAvatar player={winner} size="sm" />
                   <span className="font-semibold">{winner.display_name}</span>
                   <Trophy className="size-4 text-amber-500" aria-label="vincitore" />

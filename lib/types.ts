@@ -7,7 +7,6 @@ export type Cosmetics = {
 
 export type PlayerCard = Cosmetics & {
   id: string;
-  username: string;
   display_name: string;
   avatar_url: string | null;
   coins: number;
@@ -21,7 +20,6 @@ export type LeaderboardRow = Cosmetics & {
   wins: number;
   points: number;
   win_rate: number;
-  username: string;
   display_name: string;
   avatar_url: string | null;
 };
@@ -59,10 +57,10 @@ export type MatchRow = {
 
 export type Profile = {
   id: string;
-  username: string;
   display_name: string;
   avatar_url: string | null;
   coins: number;
   onboarded: boolean;
+  is_admin: boolean;
   preferences: Record<string, unknown>;
 };

@@ -43,7 +43,7 @@ export async function deleteMatch(matchId: string): Promise<Result> {
   const { error } = await supabase.rpc("delete_match", { p_match_id: matchId });
   if (error) return { error: error.message };
   revalidatePath("/", "layout");
-  return { success: "Partita annullata, monete stornate." };
+  return { success: "Partita eliminata, monete stornate." };
 }
 
 // ---------- Giochi ----------
@@ -139,17 +139,12 @@ export async function savePreferences(input: StoredPreferences): Promise<Result>
 // ---------- Profilo ----------
 
 export async function updateProfile(input: {
-  username: string;
   displayName: string;
   avatarPath?: string | null;
 }): Promise<Result> {
   const { supabase, userId } = await authed();
-  const username = input.username.trim().toLowerCase();
   const displayName = input.displayName.trim();
 
-  if (!/^[a-z0-9_]{3,20}$/.test(username)) {
-    return { error: "Username: 3-20 caratteri tra lettere minuscole, numeri e _" };
-  }
   if (!displayName || displayName.length > 40) {
     return { error: "Il nome deve avere tra 1 e 40 caratteri" };
   }
@@ -158,17 +153,13 @@ export async function updateProfile(input: {
   }
 
   const update: Record<string, unknown> = {
-    username,
     display_name: displayName,
     onboarded: true,
   };
   if (input.avatarPath !== undefined) update.avatar_url = input.avatarPath;
 
   const { error } = await supabase.from("profiles").update(update).eq("id", userId);
-  if (error) {
-    if (error.code === "23505") return { error: "Username già preso" };
-    return { error: error.message };
-  }
+  if (error) return { error: error.message };
   revalidatePath("/", "layout");
   return { success: "Profilo salvato!" };
 }

@@ -12,20 +12,17 @@ import { uploadImage } from "@/lib/upload";
 import { errorMessage } from "@/lib/utils-app";
 
 export function ProfileForm({
-  username: initialUsername,
   displayName: initialDisplayName,
   avatarUrl,
   submitLabel = "Salva",
   redirectTo,
 }: {
-  username: string;
   displayName: string;
   avatarUrl: string | null;
   submitLabel?: string;
   redirectTo?: string;
 }) {
   const router = useRouter();
-  const [username, setUsername] = useState(initialUsername);
   const [displayName, setDisplayName] = useState(initialDisplayName);
   const [file, setFile] = useState<File | null>(null);
   const [pending, startTransition] = useTransition();
@@ -35,7 +32,7 @@ export function ProfileForm({
     startTransition(async () => {
       try {
         const avatarPath = file ? await uploadImage("avatars", file) : undefined;
-        const res = await updateProfile({ username, displayName, avatarPath });
+        const res = await updateProfile({ displayName, avatarPath });
         if (res.error) {
           toast.error(res.error);
           return;
@@ -43,7 +40,6 @@ export function ProfileForm({
         toast.success(res.success);
         setFile(null);
         if (redirectTo) router.push(redirectTo);
-        else if (username !== initialUsername) router.replace(`/profilo/${username.trim().toLowerCase()}`);
       } catch (err) {
         toast.error(errorMessage(err));
       }
@@ -67,24 +63,6 @@ export function ProfileForm({
           className="h-11 text-base"
           autoComplete="nickname"
         />
-      </div>
-      <div className="grid gap-2">
-        <Label htmlFor="username">Username</Label>
-        <Input
-          id="username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value.toLowerCase())}
-          pattern="[a-z0-9_]{3,20}"
-          maxLength={20}
-          required
-          className="h-11 text-base"
-          autoCapitalize="none"
-          autoComplete="username"
-          aria-describedby="username-hint"
-        />
-        <p id="username-hint" className="text-xs text-muted-foreground">
-          3-20 caratteri: lettere minuscole, numeri e _
-        </p>
       </div>
       <Button type="submit" size="lg" className="h-11" disabled={pending}>
         {pending ? "Salvataggio…" : submitLabel}

@@ -3,7 +3,7 @@ import { PlayerAvatar } from "@/components/player-avatar";
 import { cn } from "@/lib/utils";
 
 export type ChipPlayer = {
-  username: string;
+  player_id: string;
   display_name: string;
   avatar_url: string | null;
   crown?: string | null;
@@ -24,7 +24,7 @@ export function PlayerChip({
 }) {
   return (
     <Link
-      href={`/profilo/${player.username}`}
+      href={`/profilo/${player.player_id}`}
       className={cn("group flex min-w-0 items-center gap-3 rounded-md", className)}
     >
       <PlayerAvatar player={player} size={size} />

@@ -82,7 +82,7 @@ function Step({ place, group, small }: { place: Place; group: LeaderboardRow[]; 
           {group.map((row) => (
             <Link
               key={row.player_id}
-              href={`/profilo/${row.username}`}
+              href={`/profilo/${row.player_id}`}
               className={cn(
                 "podium-player group flex min-w-0 flex-col items-center text-center",
                 shared ? "max-w-[6.5rem] flex-1 basis-0" : "max-w-full",

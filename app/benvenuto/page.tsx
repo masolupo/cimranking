@@ -20,7 +20,6 @@ export default async function BenvenutoPage() {
         </div>
         <div className="rounded-xl border bg-card p-6">
           <ProfileForm
-            username=""
             displayName={profile.display_name}
             avatarUrl={null}
             submitLabel="Inizia a giocare"

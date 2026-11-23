@@ -57,7 +57,7 @@ export default async function GamePage({ params }: PageProps<"/giochi/[slug]">) 
             {champion && (
               <>
                 {" · campione attuale: "}
-                <Link href={`/profilo/${champion.username}`} className="font-semibold text-foreground hover:underline">
+                <Link href={`/profilo/${champion.player_id}`} className="font-semibold text-foreground hover:underline">
                   {champion.display_name}
                 </Link>
               </>
@@ -80,7 +80,7 @@ export default async function GamePage({ params }: PageProps<"/giochi/[slug]">) 
         </section>
         <section>
           <SectionTitle>Storico partite</SectionTitle>
-          <MatchList matches={matches} players={playersById(players)} currentUserId={profile.id} showGame={false} />
+          <MatchList matches={matches} players={playersById(players)} canDelete={profile.is_admin} showGame={false} />
         </section>
       </div>
     </>
